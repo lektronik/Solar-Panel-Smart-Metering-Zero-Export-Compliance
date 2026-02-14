@@ -1,0 +1,79 @@
+mqtt:
+  broker: ${MQTT_BROKER:-localhost}
+  port: ${MQTT_PORT:-1883}
+  # Client ID for the Smart Metering & Control service
+  client_id: smart-meter-control
+  topic_prefix: zeropower
+  # OpenDTU MQTT topic prefix (configured in OpenDTU web UI)
+  opendtu_topic: solar
+
+opendtu:
+  # IP address of the OpenDTU device (ESP32)
+  ip: ${OPENDTU_IP:-192.168.x.x}
+  # OpenDTU Web UI credentials (if protected)
+  user: ${OPENDTU_USER:-admin}
+  password: ${OPENDTU_PASS:-secret}
+
+powermeter:
+  # Interface implemented in src/meters/powermeter.py
+  # Supported protocols: gen1_em (Shelly EM), gen1_3em (Shelly 3EM), gen2_3em_pro (Pro 3EM), etc.
+  # See code for full list.
+  type: gen1_em
+  # IP address of the Power Meter
+  ip: ${METER_IP:-192.168.x.x}
+  # Auth for Power Meter (if enabled)
+  user: ${METER_USER:-admin}
+  password: ${METER_PASS:-}
+  # For specific meters (e.g. Gen 1 EM), specify channel (0 or 1)
+  emeter_index: 0
+  # How often to poll the meter via HTTP (seconds)
+  poll_interval_s: 1
+
+control:
+  # Desired grid setpoint in Watts (negative = feed-in, positive = import)
+  # 30W import ensures strict zero export even with measurement fluctuation
+  target_point_w: 30
+  # Deadband: no action if usage is within target +/- tolerance
+  tolerance_w: 15
+  # Max power reading to consider as valid
+  max_point_w: 50
+  # If grid goes below this (exporting), immediate action is taken
+  min_point_w: 0
+  # Main control loop interval (seconds)
+  loop_interval_s: 5
+  # Timeout for inverter limit ACK
+  set_limit_timeout_s: 5
+
+  # PID Controller Parameters
+  # Tuned for typical residential setups with moderate latency
+  kp: 0.8   # Proportional gain
+  ki: 0.15  # Integral gain
+  kd: 0.05  # Derivative gain
+  # Anti-windup clamping for integral term
+  integral_max: 500
+  
+  # Advanced Grid Protection
+  # If grid import jumps above a threshold, immediately cut power? (%)
+  on_grid_jump_percent: 0
+  # If feeding in to grid, decrease limit faster than normal PID?
+  fast_limit_decrease: true
+
+inverters:
+  # List all your inverters here
+  - serial: "11xxxxxxxxxx"  # Replace with actual inverter serial
+    enabled: true
+    max_watt: 1200           # Inverter max rating
+    inverter_watt: 1200      # Soft limit if desired (same as max usually)
+    min_watt_percent: 5      # Minimum power % (usually 2-5%)
+    compensate_factor: 1.0   # Multiplier for calibration (1.0 = no change)
+    battery_mode: false      # Set true if using battery (different logic may apply)
+
+influxdb:
+  url: ${INFLUXDB_URL:-http://localhost:8086}
+  token: ${INFLUXDB_TOKEN:-my-super-secret-auth-token}
+  org: ${INFLUXDB_ORG:-solar}
+  bucket: ${INFLUXDB_BUCKET:-zero_export}
+
+logging:
+  level: INFO
+  to_file: false

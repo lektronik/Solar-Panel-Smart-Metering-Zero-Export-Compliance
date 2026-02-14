@@ -1,0 +1,1338 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "links": [],
+    "panels": [
+        {
+            "title": "Zero Export Status",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"control\" and r._field == \"enabled\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [
+                        {
+                            "type": "value",
+                            "options": {
+                                "0": {
+                                    "text": "OFF",
+                                    "color": "red"
+                                },
+                                "1": {
+                                    "text": "ON",
+                                    "color": "green"
+                                }
+                            }
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "red"
+                            },
+                            {
+                                "value": 1,
+                                "color": "green"
+                            }
+                        ]
+                    },
+                    "color": {
+                        "mode": "thresholds"
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            },
+            "links": [
+                {
+                    "title": "Toggle Zero Export",
+                    "url": "http://localhost:8080/api/toggle?redirect=http://localhost:3000/d/zero-export-main/zero-export?orgId=1",
+                    "targetBlank": false
+                }
+            ]
+        },
+        {
+            "title": "Power (AC)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 4,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"power\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "dark-blue"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "dark-blue"
+                            }
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Temperature",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 8,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"temperature\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "celsius",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "green"
+                            },
+                            {
+                                "value": 50,
+                                "color": "orange"
+                            },
+                            {
+                                "value": 65,
+                                "color": "red"
+                            }
+                        ]
+                    },
+                    "color": {
+                        "mode": "thresholds"
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Production Today (AC)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 11,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"yield_day\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watth",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "super-light-yellow"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "super-light-yellow"
+                            }
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Production Total (AC)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 15,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"yield_total\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "kwatth",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "light-yellow"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "light-yellow"
+                            }
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Peak Power (AC)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 18,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"power\")\n  |> max()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "light-blue"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "light-blue"
+                            }
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Peak Power (DC)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 21,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"dc_power\")\n  |> max()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "light-purple"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "light-purple"
+                            }
+                        ]
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Grid Power",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 4
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"power\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "yellow"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Power (AC + DC)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 4
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and (r._field == \"power\" or r._field == \"dc_power\" or r._field == \"limit\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "power"
+                        },
+                        "properties": [
+                            {
+                                "id": "displayName",
+                                "value": "AC Power"
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "mode": "fixed",
+                                    "fixedColor": "blue"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "dc_power"
+                        },
+                        "properties": [
+                            {
+                                "id": "displayName",
+                                "value": "DC Power"
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "mode": "fixed",
+                                    "fixedColor": "purple"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "limit"
+                        },
+                        "properties": [
+                            {
+                                "id": "displayName",
+                                "value": "Limit"
+                            },
+                            {
+                                "id": "color",
+                                "value": {
+                                    "mode": "fixed",
+                                    "fixedColor": "red"
+                                }
+                            },
+                            {
+                                "id": "custom.lineStyle",
+                                "value": {
+                                    "fill": "dash",
+                                    "dash": [
+                                        10,
+                                        10
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "title": "Voltage (AC)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 12
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"ac_voltage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "volt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "light-green"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Current (AC)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 12
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"ac_current\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "amp",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "light-orange"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Voltages (DC)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 20
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"voltage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "volt",
+                    "custom": {
+                        "fillOpacity": 5,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Temperature",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 20
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"temperature\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "celsius",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "orange"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Power Factor",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 28
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"power_factor\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "none",
+                    "min": 0,
+                    "max": 1,
+                    "decimals": 3,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-purple"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Reactive Power",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 28
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"reactive_power\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "voltamp",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-green"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Frequency",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 36
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"frequency\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "hertz",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "dark-green"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Efficiency",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 36
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"efficiency\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent",
+                    "min": 0,
+                    "max": 100,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "dark-yellow"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Control Setpoint",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 44
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"control\" and r._field == \"setpoint\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "green"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Voltage",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 52
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"voltage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "volt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "yellow"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Current",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 52
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"current\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "amp",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "orange"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Power Factor",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 60
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"pf\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "none",
+                    "min": 0,
+                    "max": 1,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "purple"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Reactive Power",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 60
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"reactive\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "voltampreact",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "dark-purple"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Energy Imported / Exported",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 68
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"energy_imported\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "A"
+                },
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"energy_exported\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "B"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watth",
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Irradiation",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 76
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"irradiation\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent",
+                    "min": 0,
+                    "max": 100,
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 25,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Yield (Daily)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 76
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"yield_day\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watth",
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Inverter Limit (%)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 84
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"limit_relative\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent",
+                    "min": 0,
+                    "max": 100,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-blue"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Voltage",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 92
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"voltage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "volt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "yellow"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Current",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 92
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"current\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "amp",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "orange"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Power Factor",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 100
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"pf\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "none",
+                    "min": 0,
+                    "max": 1,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "purple"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Grid Reactive Power",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 100
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"reactive\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "voltampreact",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "dark-purple"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Energy Imported / Exported",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 108
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"energy_imported\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "A"
+                },
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"energy_exported\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "B"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watth",
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Irradiation",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 116
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"irradiation\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent",
+                    "min": 0,
+                    "max": 100,
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 25,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Yield (Daily)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 116
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"yield_day\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watth",
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Inverter Limit (%)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 124
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"limit_relative\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percent",
+                    "min": 0,
+                    "max": 100,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-blue"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        }
+    ],
+    "schemaVersion": 39,
+    "tags": [
+        "solar",
+        "zero-export",
+        "opendtu"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Zero Export",
+    "uid": "zero-export-main"
+}
