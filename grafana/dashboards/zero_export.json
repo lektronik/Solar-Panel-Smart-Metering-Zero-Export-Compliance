@@ -1,0 +1,245 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "links": [],
+    "panels": [
+        {
+            "title": "Zero Export Status",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"control\" and r._field == \"enabled\")\n  |> last()",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [
+                        {
+                            "type": "value",
+                            "options": {
+                                "0": {
+                                    "text": "OFF",
+                                    "color": "red"
+                                },
+                                "1": {
+                                    "text": "ON",
+                                    "color": "green"
+                                }
+                            }
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "red"
+                            },
+                            {
+                                "value": 1,
+                                "color": "green"
+                            }
+                        ]
+                    },
+                    "color": {
+                        "mode": "thresholds"
+                    }
+                }
+            },
+            "options": {
+                "colorMode": "background",
+                "textMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center"
+            }
+        },
+        {
+            "title": "Grid Power",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 18,
+                "x": 6,
+                "y": 0
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"grid\" and r._field == \"power\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "yellow"
+                    },
+                    "custom": {
+                        "fillOpacity": 15,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Inverter Power & Limit",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and (r._field == \"power\" or r._field == \"limit\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Panel Voltages",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"panel\" and r._field == \"voltage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "volt",
+                    "custom": {
+                        "fillOpacity": 5,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Inverter Temperature",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 16
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"inverter\" and r._field == \"temperature\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "celsius",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "orange"
+                    },
+                    "custom": {
+                        "fillOpacity": 10,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "Control Setpoint",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 16
+            },
+            "datasource": {
+                "type": "influxdb",
+                "uid": "zero-export-influxdb"
+            },
+            "targets": [
+                {
+                    "query": "from(bucket: \"zero_export\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"control\" and r._field == \"setpoint\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "watt",
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "green"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 2
+                    }
+                }
+            }
+        }
+    ],
+    "schemaVersion": 39,
+    "tags": [
+        "solar",
+        "zero-export"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Zero Export",
+    "uid": "zero-export-main"
+}

@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: zero-export-influxdb
+    access: proxy
+    url: ${INFLUXDB_URL:-http://influxdb:8086}
+    user: ${INFLUXDB_ADMIN_USER:-admin}
+    jsonData:
+      version: Flux
+      organization: ${INFLUXDB_ORG:-solar}
+      defaultBucket: ${INFLUXDB_BUCKET:-zero_export}
+      tlsSkipVerify: true  # Useful for local dev if using https
+    secureJsonData:
+      token: ${INFLUXDB_TOKEN:-my-super-secret-auth-token}
+    isDefault: true

@@ -1,0 +1,84 @@
+services:
+  app:
+    build: .
+    container_name: zero-export-generic
+    restart: unless-stopped
+    network_mode: host # Required for mDNS discovery of OpenDTU
+    env_file: .env
+    environment:
+      - CONFIG_PATH=/app/config.yaml
+      - MQTT_BROKER=${MQTT_BROKER:-localhost}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - OPENDTU_IP=${OPENDTU_IP:-192.168.1.50}
+      - OPENDTU_USER=${OPENDTU_USER:-admin}
+      - OPENDTU_PASS=${OPENDTU_PASS:-secret}
+      - SHELLY_IP=${SHELLY_IP:-192.168.1.60}
+      - SHELLY_USER=${SHELLY_USER:-admin}
+      - SHELLY_PASS=${SHELLY_PASS:-}
+      - INFLUXDB_URL=${INFLUXDB_URL:-http://localhost:8086}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:-my-super-secret-auth-token}
+      - INFLUXDB_ORG=${INFLUXDB_ORG:-solar}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:-zero_export}
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    depends_on:
+      mosquitto:
+        condition: service_started
+      influxdb:
+        condition: service_healthy
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto-generic
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb-generic
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_ADMIN_USER:-admin}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_ADMIN_PASS:-admin123}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG:-solar}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET:-zero_export}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN:-my-super-secret-auth-token}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: [ "CMD", "influx", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-generic
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  influxdb_data:
+  grafana_data:

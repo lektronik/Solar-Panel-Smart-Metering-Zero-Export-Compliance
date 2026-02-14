@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Docker / Data Volumes (if mapped locally)
+mosquitto/data/
+mosquitto/log/
+influxdb_data/
+grafana_data/
+
+# IDEs
+.vscode/
+.idea/
