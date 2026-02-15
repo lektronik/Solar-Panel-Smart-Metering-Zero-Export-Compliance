@@ -42,20 +42,18 @@ control:
   # Main control loop interval (seconds)
   loop_interval_s: 5
   # Timeout for inverter limit ACK
+  # Loop delay
   set_limit_timeout_s: 5
 
-  # PID Controller Parameters
-  # Tuned for typical residential setups with moderate latency
-  kp: 0.8   # Proportional gain
-  ki: 0.15  # Integral gain
-  kd: 0.05  # Derivative gain
-  # Anti-windup clamping for integral term
-  integral_max: 500
-  
+  # Legacy-style "Slow Approximation" Logic
+  # Dampens the reduction of power limit to avoid oscillation
+  slow_approx_limit_percent: 50
+  slow_approx_factor_percent: 50
+
   # Advanced Grid Protection
   # If grid import jumps above a threshold, immediately cut power? (%)
   on_grid_jump_percent: 0
-  # If feeding in to grid, decrease limit faster than normal PID?
+  # If feeding in to grid, decrease limit faster than normal Integral control?
   fast_limit_decrease: true
 
 inverters:

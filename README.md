@@ -21,7 +21,7 @@ This project serves as a complete **Smart Metering** and **Zero Export** solutio
 ## 🚀 Key Features
 
 - **Smart Metering**: Collects **14+ telemetry fields** per inverter (AC/DC power, voltage, current, frequency, power factor, reactive power, temperature, efficiency, limits, daily/total yield, status) and per-panel DC metrics.
-- **Zero Export**: PID controller with anti-windup, fast grid-spike response, and configurable deadband to prevent grid feed-in while maximizing self-consumption.
+- **Zero Export**: Robust **Integral Controller** with "Slow Approximation" dampening logic (derived from proven legacy systems) to prevent grid feed-in while ensuring stable, non-oscillating power limits.
 - **HTTP Control API**: Toggle zero-export on/off via REST endpoint or directly from the Grafana dashboard — no MQTT client needed.
 - **Always-On Monitoring**: Telemetry is recorded continuously even when the control loop is paused, so Grafana always has data.
 - **Generic & Secure**: No hardcoded credentials. All secrets via `.env` and `config.yaml` with environment variable substitution.

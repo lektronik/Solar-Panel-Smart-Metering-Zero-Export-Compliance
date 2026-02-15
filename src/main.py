@@ -13,7 +13,7 @@ from src.config import load_config
 from src.mqtt_client import MqttClient
 from src.dtu.opendtu import OpenDTUAdapter
 from src.meters.powermeter import PowerMeter
-from src.controller import PIDController
+from src.controller import ZeroExportController
 from src.data_logger import DataLogger
 
 logging.basicConfig(
@@ -72,7 +72,7 @@ async def _start_http(host="0.0.0.0", port=8080):
 
 async def control_loop(
     cfg, mqtt: MqttClient, dtu: OpenDTUAdapter,
-    meter: PowerMeter, pid: PIDController, telemetry: DataLogger,
+    meter: PowerMeter, controller: ZeroExportController, telemetry: DataLogger,
 ):
     ctrl = cfg.control
     inverters = cfg.inverters
@@ -198,7 +198,7 @@ async def control_loop(
                 continue
 
             # Compute new setpoint
-            new_limit = pid.compute(grid_watts, total_max_watt, total_min_watt)
+            new_limit = controller.compute(grid_watts, total_max_watt, total_min_watt)
 
             # Distribute limit across inverters proportionally
             remaining = new_limit
@@ -233,7 +233,7 @@ async def control_loop(
                 if grid_watts > ctrl.max_point_w or (
                     grid_watts < ctrl.min_point_w and ctrl.fast_limit_decrease
                 ):
-                    new_limit = pid.compute(grid_watts, total_max_watt, total_min_watt)
+                    new_limit = controller.compute(grid_watts, total_max_watt, total_min_watt)
                     for inv in active_inverters:
                         share = int(new_limit * inv.max_watt / total_max_watt)
                         min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
@@ -264,7 +264,7 @@ async def main():
         emeter_index=cfg.powermeter.get("emeter_index", 0),
         meter_type=cfg.powermeter.type,
     )
-    pid = PIDController(cfg)
+    controller = ZeroExportController(cfg)
     telemetry = DataLogger(cfg)
 
     # Register MQTT handlers
@@ -293,7 +293,7 @@ async def main():
     tasks = [
         asyncio.create_task(mqtt.run()),
         asyncio.create_task(telemetry.run()),
-        asyncio.create_task(control_loop(cfg, mqtt, dtu, meter, pid, telemetry)),
+        asyncio.create_task(control_loop(cfg, mqtt, dtu, meter, controller, telemetry)),
     ]
 
     await stop.wait()
