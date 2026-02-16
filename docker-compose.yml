@@ -21,6 +21,7 @@ services:
       - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:-zero_export}
     volumes:
       - ./config.yaml:/app/config.yaml:ro
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       mosquitto:
         condition: service_started
@@ -38,6 +39,7 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
+      - /etc/localtime:/etc/localtime:ro
 
   influxdb:
     image: influxdb:2
@@ -54,6 +56,7 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN:-my-super-secret-auth-token}
     volumes:
       - influxdb_data:/var/lib/influxdb2
+      - /etc/localtime:/etc/localtime:ro
     healthcheck:
       test: [ "CMD", "influx", "ping" ]
       interval: 10s
@@ -73,6 +76,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       influxdb:
         condition: service_healthy
