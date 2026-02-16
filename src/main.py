@@ -81,8 +81,11 @@ async def control_loop(
     limit_timeout = ctrl.set_limit_timeout_s
 
     await asyncio.sleep(3)
+    await asyncio.sleep(3)
     logger.info("Control loop starting")
-
+    
+    last_sent_limit = -1
+    
     await dtu.check_version_http()
 
     while True:
@@ -100,7 +103,12 @@ async def control_loop(
                 active_inverters.append(inv)
                 total_max_watt += inv.max_watt
                 min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
+                min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
                 total_min_watt += min_w
+
+            # Calculate total current inverter power (Sensor-Based)
+            total_current_watts = sum(dtu.get_ac_power(i.serial) for i in active_inverters)
+            logger.debug("Total Inverter Power: %dW", int(total_current_watts))
 
             # Poll powermeter (full response)
             grid = await meter.read_full()
@@ -197,49 +205,51 @@ async def control_loop(
                 await asyncio.sleep(loop_interval)
                 continue
 
-            # Compute new setpoint
-            new_limit = controller.compute(grid_watts, total_max_watt, total_min_watt)
+            # Compute new setpoint (Sensor-Based)
+            new_limit = controller.compute(grid_watts, total_current_watts, total_max_watt, total_min_watt)
 
-            # Distribute limit across inverters proportionally
-            remaining = new_limit
-            for inv in active_inverters:
-                share = int(new_limit * inv.max_watt / total_max_watt)
-                min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
-                share = max(min_w, min(inv.max_watt, share))
-
-                factor = inv.get("compensate_factor", 1.0)
-                if factor != 1.0:
-                    share = int(share * factor)
-                    share = max(min_w, min(inv.inverter_watt, share))
-
-                await dtu.set_limit(inv.serial, share, mqtt)
-                remaining -= share
-
-                telemetry.record(
-                    "control",
-                    {"setpoint": float(share)},
-                    tags={"serial": inv.serial},
-                )
-
-            # Publish state via MQTT
-            await mqtt.publish_state("limit", new_limit)
+            
+            # Send command if changed
+            if abs(new_limit - last_sent_limit) > 0:
+                 # Distribute limit across inverters proportionally
+                remaining = new_limit
+                for inv in active_inverters:
+                    share = int(new_limit * inv.max_watt / total_max_watt)
+                    min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
+                    share = max(min_w, min(inv.max_watt, share))
+    
+                    factor = inv.get("compensate_factor", 1.0)
+                    if factor != 1.0:
+                        share = int(share * factor)
+                        share = max(min_w, min(inv.inverter_watt, share))
+    
+                    await dtu.set_limit(inv.serial, share, mqtt)
+                    remaining -= share
+    
+                    telemetry.record(
+                        "control",
+                        {"setpoint": float(share)},
+                        tags={"serial": inv.serial},
+                    )
+                
+                # Publish state via MQTT
+                await mqtt.publish_state("limit", new_limit)
+                
+                last_sent_limit = new_limit
+                
+                # Wait for inverter to react (3s + 1s loop = 4s total)
+                logger.info("Adjusted limit to %dW. Waiting 5s...", new_limit)
+                await asyncio.sleep(5)
+            
+            else:
+                # No change. Just loop (Wait 1s).
+                # Publish state (limit) anyway? Or only on change?
+                # Maybe publish grid power every loop.
+                pass
+                
             await mqtt.publish_state("grid_power", int(grid_watts))
-
-            # Poll at higher frequency within the loop interval
-            for _ in range(int(loop_interval / poll_interval) - 1):
-                await asyncio.sleep(poll_interval)
-                grid_watts = await meter.read_watts()
-
-                if grid_watts > ctrl.max_point_w or (
-                    grid_watts < ctrl.min_point_w and ctrl.fast_limit_decrease
-                ):
-                    new_limit = controller.compute(grid_watts, total_max_watt, total_min_watt)
-                    for inv in active_inverters:
-                        share = int(new_limit * inv.max_watt / total_max_watt)
-                        min_w = int(inv.inverter_watt * inv.min_watt_percent / 100)
-                        share = max(min_w, min(inv.max_watt, share))
-                        await dtu.set_limit(inv.serial, share, mqtt)
-                    break
+            
+            # (Deleted inner polling loop)
 
         except Exception:
             logger.exception("Control loop error")

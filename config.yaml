@@ -25,22 +25,22 @@ powermeter:
   user: ${METER_USER:-admin}
   password: ${METER_PASS:-}
   # For specific meters (e.g. Gen 1 EM), specify channel (0 or 1)
-  emeter_index: 0
+  # emeter_index: 0 # Uncomment to read specific channel. Default: Total Power (Sum)
   # How often to poll the meter via HTTP (seconds)
   poll_interval_s: 1
 
 control:
   # Desired grid setpoint in Watts (negative = feed-in, positive = import)
   # 30W import ensures strict zero export even with measurement fluctuation
-  target_point_w: 30
+  target_point_w: 15
   # Deadband: no action if usage is within target +/- tolerance
   tolerance_w: 15
   # Max power reading to consider as valid
-  max_point_w: 50
+  max_point_w: 31
   # If grid goes below this (exporting), immediate action is taken
   min_point_w: 0
   # Main control loop interval (seconds)
-  loop_interval_s: 5
+  loop_interval_s: 1
   # Timeout for inverter limit ACK
   # Loop delay
   set_limit_timeout_s: 5
