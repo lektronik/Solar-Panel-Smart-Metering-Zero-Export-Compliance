@@ -155,3 +155,26 @@ This project is built upon the excellent work of the open-source community:
 - **[HoymilesZeroExport](https://github.com/reserve85/HoymilesZeroExport)**: The original logic for zero-export control.
 - **[OpenDTU](https://github.com/tbnobody/OpenDTU)**: The bridge enabling communication with Hoymiles inverters.
 - **[OpenDTU Solar](https://www.opendtu.solar/)**: Documentation and project site for OpenDTU.
+
+## 🧪 Development & Testing
+
+To run the tests, it is recommended to use a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install pytest pytest-asyncio pytest-cov
+```
+
+Then run the test suite:
+
+```bash
+pytest tests/
+```
+
+To see coverage report:
+
+```bash
+pytest --cov=src tests/
+```
